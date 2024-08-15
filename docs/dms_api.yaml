@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  title: DMS API
+  description: Identifies the research service operations necessary to sync the DMS data store to our research service across two given points in time
+  version: 0.1.1
+servers:
+  - url: http://127.0.0.1:8000
+    description: Development server
+
+
+paths:
+  /operations:
+    get:
+      tags:
+        - Operations
+      summary: List operations to sync DMS data
+      parameters:
+        - name: from_date
+          in: query
+          required: true
+          description: Initial date
+          schema:
+            type : string
+            format: date
+            example: 2023-05-01
+        - name: to_date
+          in: query
+          required: true
+          description: Last date
+          schema:
+            type : string
+            format: date
+            example: 2023-05-02
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operation'
+
+components:
+  schemas:
+    Operation:
+      type: object
+      properties:
+        operation_type: 
+          type: string
+          example: createFile
+          readOnly: true
+        changes:
+          type: object
+          properties:
+            id: 
+              type: string
+              format: uuid
+            name:
+              type: string
+              example: msj-a
+            meta:
+              type: object
