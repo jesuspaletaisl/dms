@@ -44,7 +44,7 @@ class Operation:
 
         try:
             async with aiofiles.open(filename, mode = 'r') as f:
-                content = await f.read()
+                content = [json.loads(line) async for line in f if line]
 
         except Exception as ex:
             print("Error file", filename)
@@ -52,15 +52,7 @@ class Operation:
         if not content:
             return {}
 
-        content = content.rstrip()
-
-        content = content.split("\n")
-
-        docs = {}
-        for x in content:
-            doc = json.loads(x)
-            docs[doc["id"]] = doc
-
+        docs = {doc["id"]: doc for doc in content}
 
         return docs
 
@@ -89,9 +81,6 @@ class Operation:
 
         #Concatenate ids from both docs
         all_ids = {*last_docs.keys(), *current_docs.keys()}
-
-        print("ids", json.dumps(list(all_ids), indent=4))
-
 
         #Compare the docs using the ID and return the operations
         aws = [self.compare_docs(last_docs.get(id, {}), current_docs.get(id, {})) for id in all_ids]
